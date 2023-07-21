@@ -1,10 +1,7 @@
 package com.teamwepin.wepin.tests.sample;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -23,6 +20,11 @@ public class SampleController {
     @PostMapping("/samples")
     public Long saveSample(@RequestBody Sample sample) {
         return sampleService.saveSample(sample);
+    }
+
+    @GetMapping("/samples/{sampleId}")
+    public Sample getSample(@PathVariable Long sampleId) {
+        return sampleService.findOne(sampleId);
     }
 
 }

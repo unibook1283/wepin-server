@@ -26,7 +26,7 @@ public class SampleService {
     @Transactional(readOnly = true)
     public Sample findOne(Long sampleId) {
         return sampleRepository.findById(sampleId)
-                .orElseThrow(IllegalArgumentException::new);
+                .orElseThrow(SampleNotFoundException::new);
     }
 
 }
