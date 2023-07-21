@@ -1,4 +1,4 @@
-package com.teamwepin.wepin.tests.global.config;
+package com.teamwepin.wepin.global.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
