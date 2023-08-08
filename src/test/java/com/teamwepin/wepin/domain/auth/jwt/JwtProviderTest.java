@@ -1,11 +1,13 @@
 package com.teamwepin.wepin.domain.auth.jwt;
 
-import com.teamwepin.wepin.domain.jwt.JwtProvider;
+import com.teamwepin.wepin.domain.jwt.application.JwtProvider;
+import com.teamwepin.wepin.domain.jwt.exception.InvalidTokenException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 class JwtProviderTest {
@@ -37,4 +39,10 @@ class JwtProviderTest {
 
         assertThat(res).isTrue();
     }
+
+    @Test
+    void invalidTokenException() {
+        assertThrows(InvalidTokenException.class, () -> jwtProvider.getPayload("asdf"));
+    }
+
 }

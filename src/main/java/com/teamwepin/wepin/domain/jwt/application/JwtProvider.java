@@ -1,5 +1,6 @@
-package com.teamwepin.wepin.domain.jwt;
+package com.teamwepin.wepin.domain.jwt.application;
 
+import com.teamwepin.wepin.domain.jwt.exception.InvalidTokenException;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -45,7 +46,7 @@ public class JwtProvider {
         } catch (ExpiredJwtException e) {
             return e.getClaims().getSubject();
         } catch (JwtException | IllegalArgumentException e) {
-            throw new RuntimeException("유효하지 않은 토큰입니다.");   // todo. exception 만들어서 처리하기.
+            throw new InvalidTokenException();
         }
     }
 

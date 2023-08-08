@@ -13,6 +13,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ExControllerAdvice {
 
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler
+    public ErrorResult unauthorizedExHandler(UnauthorizedException e) {
+        log.error("[exceptionHandler] ex", e);
+        return new ErrorResult(e.getCode(), e.getMessage());
+    }
+
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler
     public ErrorResult badRequestExceptionHandler(BadRequestException e) {
@@ -26,13 +33,6 @@ public class ExControllerAdvice {
         log.error("[exceptionHandler] ex", e);
         return new ErrorResult("ILL-ARG", e.getMessage());
     }
-
-//    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-//    @ExceptionHandler
-//    public ErrorResult unauthorizedExHandler(UnauthorizedException e) {
-//        log.error("[exceptionHandler] ex", e);
-//        return new ErrorResult("UNAUTH", "작업을 수행할 권한이 없습니다.");
-//    }
 
     /**
      * Spring validation 유효성 검증 실패 시 발생하는 exception
