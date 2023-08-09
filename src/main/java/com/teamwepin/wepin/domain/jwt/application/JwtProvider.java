@@ -23,6 +23,10 @@ public class JwtProvider {
         return createToken(payload, accessTokenValidityInMilliseconds);
     }
 
+    public String createRefreshToken(String payload) {
+        return createToken(payload, refreshTokenValidityInMilliseconds);
+    }
+
     private String createToken(String payload, long expireLength) {
         Date now = new Date();
         Date validity = new Date(now.getTime() + expireLength);
