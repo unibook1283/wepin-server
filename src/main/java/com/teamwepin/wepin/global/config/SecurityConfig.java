@@ -4,6 +4,7 @@ import com.teamwepin.wepin.domain.auth.filter.CustomUsernamePasswordAuthenticati
 import com.teamwepin.wepin.domain.auth.filter.ExceptionHandlingFilter;
 import com.teamwepin.wepin.domain.auth.filter.JwtAuthenticationFilter;
 import com.teamwepin.wepin.domain.jwt.application.JwtService;
+import com.teamwepin.wepin.domain.user.dao.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +24,7 @@ import org.springframework.security.web.session.DisableEncodeUrlFilter;
 public class SecurityConfig {
 
     private final JwtService jwtService;
+    private final UserRepository userRepository;
 
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -32,7 +34,7 @@ public class SecurityConfig {
                 .addFilterBefore(
                         new CustomUsernamePasswordAuthenticationFilter(authenticationManager(http.getSharedObject(AuthenticationConfiguration.class)), jwtService),
                         UsernamePasswordAuthenticationFilter.class)
-                .addFilterAfter(new JwtAuthenticationFilter(jwtService), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(new JwtAuthenticationFilter(jwtService, userRepository), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new ExceptionHandlingFilter(), DisableEncodeUrlFilter.class)
                 .authorizeHttpRequests()
 //                .antMatchers("/secured").authenticated()

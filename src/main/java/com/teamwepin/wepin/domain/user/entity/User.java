@@ -1,9 +1,6 @@
 package com.teamwepin.wepin.domain.user.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,5 +24,8 @@ public class User {
     private String password;
 
     private String email;
+
+    @Setter
+    private String refreshToken;
 
 }

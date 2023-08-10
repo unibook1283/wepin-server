@@ -3,6 +3,8 @@ package com.teamwepin.wepin.domain.auth.filter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.teamwepin.wepin.domain.auth.support.AuthConstants;
 import com.teamwepin.wepin.domain.jwt.application.JwtService;
+import com.teamwepin.wepin.domain.user.dao.UserRepository;
+import com.teamwepin.wepin.domain.user.entity.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -10,6 +12,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.servlet.FilterChain;
@@ -53,6 +56,8 @@ public class CustomUsernamePasswordAuthenticationFilter extends UsernamePassword
         String username = (String) authResult.getPrincipal();
         String accessToken = jwtService.createAccessToken(username);
         String refreshToken = jwtService.createRefreshToken(username);
+
+        jwtService.setRefreshTokenToUser(username, refreshToken);
 
         Map<String, Object> body = new LinkedHashMap<>();
         body.put(AuthConstants.ACCESS_TOKEN_HEADER, accessToken);
