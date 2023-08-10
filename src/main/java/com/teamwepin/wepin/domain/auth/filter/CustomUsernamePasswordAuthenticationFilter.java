@@ -1,7 +1,9 @@
 package com.teamwepin.wepin.domain.auth.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.teamwepin.wepin.domain.jwt.application.JwtProvider;
+import com.teamwepin.wepin.domain.auth.support.AuthConstants;
+import com.teamwepin.wepin.domain.jwt.application.JwtService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,25 +20,25 @@ import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+@Slf4j
 public class CustomUsernamePasswordAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
-    public static final String usernameParameter = "username";
-    public static final String passwordParameter = "password";
-    public static final String filterProcessesUrl = "/api/v1/users/login";
+    public static final String filterProcessesUrl = "/api/v1/login";
 
-    private final JwtProvider jwtProvider;
+    private final JwtService jwtService;
 
-    public CustomUsernamePasswordAuthenticationFilter(AuthenticationManager authenticationManager, JwtProvider jwtProvider) {
+    public CustomUsernamePasswordAuthenticationFilter(AuthenticationManager authenticationManager, JwtService jwtService) {
         super(authenticationManager);
-        this.jwtProvider = jwtProvider;
+        this.jwtService = jwtService;
         setFilterProcessesUrl(filterProcessesUrl);
     }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-        String username = request.getParameter(usernameParameter);
+        log.info("[AUTH] username, password 기반 인증 시도");
+        String username = request.getParameter(AuthConstants.USERNAME_PARAMETER);
         username = (username != null) ? username.trim() : "";
-        String password = request.getParameter(passwordParameter);
+        String password = request.getParameter(AuthConstants.PASSWORD_PARAMETER);
         password = (password != null) ? password : "";
 
         UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(username, password);
@@ -46,14 +48,15 @@ public class CustomUsernamePasswordAuthenticationFilter extends UsernamePassword
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
-        request.getParameter(usernameParameter);
+        log.info("[AUTH] username, password 기반 인증 성공");
+        request.getParameter(AuthConstants.USERNAME_PARAMETER);
         String username = (String) authResult.getPrincipal();
-        String accessToken = jwtProvider.createAccessToken(username);
-        String refreshToken = jwtProvider.createRefreshToken(username);
+        String accessToken = jwtService.createAccessToken(username);
+        String refreshToken = jwtService.createRefreshToken(username);
 
         Map<String, Object> body = new LinkedHashMap<>();
-        body.put("accessToken", accessToken);
-        body.put("refreshToken", refreshToken);
+        body.put(AuthConstants.ACCESS_TOKEN_HEADER, accessToken);
+        body.put(AuthConstants.REFRESH_TOKEN_HEADER, refreshToken);
 
         // userId도 넣어주는게 좋을 듯 한데...
         response.setStatus(HttpStatus.OK.value());
@@ -64,6 +67,7 @@ public class CustomUsernamePasswordAuthenticationFilter extends UsernamePassword
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
+        log.info("[AUTH] username, password 기반 인증 실패");
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("code", "AUTH");
         body.put("message", failed.getMessage());

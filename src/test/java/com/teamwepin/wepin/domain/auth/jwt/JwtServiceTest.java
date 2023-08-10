@@ -1,6 +1,6 @@
 package com.teamwepin.wepin.domain.auth.jwt;
 
-import com.teamwepin.wepin.domain.jwt.application.JwtProvider;
+import com.teamwepin.wepin.domain.jwt.application.JwtService;
 import com.teamwepin.wepin.domain.jwt.exception.InvalidTokenException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,39 +10,39 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
-class JwtProviderTest {
+class JwtServiceTest {
 
     @Autowired
-    private JwtProvider jwtProvider;
+    private JwtService jwtService;
 
     @Test
     void createAccessToken() {
-        String accessToken = jwtProvider.createAccessToken("1");
+        String accessToken = jwtService.createAccessToken("1");
 
         System.out.println("accessToken = " + accessToken);
     }
 
     @Test
     void getPayload() {
-        String accessToken = jwtProvider.createAccessToken("1");
+        String accessToken = jwtService.createAccessToken("1");
 
-        String payload = jwtProvider.getPayload(accessToken);
+        String payload = jwtService.getPayload(accessToken);
 
         assertThat(payload).isEqualTo("1");
     }
 
     @Test
     void validateToken() {
-        String accessToken = jwtProvider.createAccessToken("1");
+        String accessToken = jwtService.createAccessToken("1");
 
-        boolean res = jwtProvider.validateToken(accessToken);
+        boolean res = jwtService.validateToken(accessToken);
 
         assertThat(res).isTrue();
     }
 
     @Test
     void invalidTokenException() {
-        assertThrows(InvalidTokenException.class, () -> jwtProvider.getPayload("asdf"));
+        assertThrows(InvalidTokenException.class, () -> jwtService.getPayload("asdf"));
     }
 
 }

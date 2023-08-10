@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 
 @Service
-public class JwtProvider {
+public class JwtService {
 
     @Value("${jwt.access-token.expire-length}")
     private long accessTokenValidityInMilliseconds;
@@ -66,5 +66,7 @@ public class JwtProvider {
             return false;
         }
     }
+
+    //todo. header validation
 
 }
