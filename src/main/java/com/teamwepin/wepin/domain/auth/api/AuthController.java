@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1")
 public class AuthController {
 
-    // filter에서 걸러져서 처리되기 때문에 여기서 처리될 일 없음. swagger를 위해 작성한 api.
-    @PostMapping("/login")
-    @Operation(summary = "기존 계정 로그인", description = "아이디, 비밀번호 기반 로그인")
+//    @Deprecated // filter에서 걸러져서 처리되기 때문에 여기서 처리될 일 없음. swagger를 위해 작성한 api.
+    @PostMapping("/users/login")
+    @Operation(summary = "기존 계정 로그인", description = "소셜 없이 하는 로그인")
     public void login(
             @Parameter(description = "아이디", required = true) @RequestParam String username,
             @Parameter(description = "비밀번호", required = true) @RequestParam String password

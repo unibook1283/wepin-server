@@ -1,6 +1,7 @@
 package com.teamwepin.wepin.domain.jwt.application;
 
-import com.teamwepin.wepin.domain.jwt.exception.InvalidTokenException;
+import com.teamwepin.wepin.domain.jwt.exception.CustomJwtException;
+import com.teamwepin.wepin.domain.jwt.exception.JwtError;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -50,7 +51,7 @@ public class JwtService {
         } catch (ExpiredJwtException e) {
             return e.getClaims().getSubject();
         } catch (JwtException | IllegalArgumentException e) {
-            throw new InvalidTokenException();
+            throw new CustomJwtException(JwtError.JWT_NOT_VALID);
         }
     }
 

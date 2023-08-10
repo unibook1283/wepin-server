@@ -1,7 +1,7 @@
 package com.teamwepin.wepin.domain.auth.jwt;
 
 import com.teamwepin.wepin.domain.jwt.application.JwtService;
-import com.teamwepin.wepin.domain.jwt.exception.InvalidTokenException;
+import com.teamwepin.wepin.domain.jwt.exception.CustomJwtException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -42,7 +42,7 @@ class JwtServiceTest {
 
     @Test
     void invalidTokenException() {
-        assertThrows(InvalidTokenException.class, () -> jwtService.getPayload("asdf"));
+        assertThrows(CustomJwtException.class, () -> jwtService.getPayload("asdf"));
     }
 
 }

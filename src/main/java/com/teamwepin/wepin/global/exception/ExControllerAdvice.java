@@ -1,7 +1,9 @@
 package com.teamwepin.wepin.global.exception;
 
+import com.teamwepin.wepin.domain.jwt.exception.CustomJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -15,9 +17,16 @@ public class ExControllerAdvice {
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler
-    public ErrorResult unauthorizedExHandler(UnauthorizedException e) {
+    public ErrorResult unauthorizedExHandler(CustomJwtException e) {
         log.error("[exceptionHandler] ex", e);
         return new ErrorResult(e.getCode(), e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler
+    public ErrorResult unauthorizedExHandler(AuthenticationException e) {
+        log.error("[exceptionHandler] ex", e);
+        return new ErrorResult("AUTH", e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
