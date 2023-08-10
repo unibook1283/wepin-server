@@ -1,11 +1,13 @@
 package com.teamwepin.wepin.domain.jwt.application;
 
+import com.teamwepin.wepin.domain.auth.support.AuthConstants;
 import com.teamwepin.wepin.domain.jwt.exception.CustomJwtException;
 import com.teamwepin.wepin.domain.jwt.exception.JwtError;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
 @Service
@@ -68,6 +70,16 @@ public class JwtService {
         }
     }
 
-    //todo. header validation
+    /**
+     * HttpServletRequest의 header에서 jwt token을 추출한다.
+     * 추출할 수 없을 경우, exception 발생
+     */
+    public String getTokenFromRequest(HttpServletRequest request, String tokenHeaderName) {
+        String headerValue = request.getHeader(tokenHeaderName);
+        if (headerValue == null || !headerValue.startsWith(AuthConstants.TOKEN_PREFIX)) {
+            throw new CustomJwtException(JwtError.JWT_HEADER_NOT_VALID);
+        }
+        return headerValue.replace(AuthConstants.TOKEN_PREFIX, "");
+    }
 
 }

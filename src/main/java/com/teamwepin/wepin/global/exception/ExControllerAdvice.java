@@ -15,6 +15,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ExControllerAdvice {
 
+    /**
+     * filter에서 발생하는 exception들은 ExceptionHandlingFilter에서 처리되도록 했음.
+     * controller에서 발생할 auth 관련 exception들을 위해 남겨놨으나 나중에 안 쓰면 지울 것.
+     * CustomJwtException, AuthenticationException 둘 다.
+     */
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler
     public ErrorResult unauthorizedExHandler(CustomJwtException e) {
