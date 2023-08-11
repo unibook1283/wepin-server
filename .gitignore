@@ -39,3 +39,4 @@ out/
 ### resources ###
 **/application-local.properties
 **/application-auth.yml
+**/application-jwt.yml
