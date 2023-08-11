@@ -28,4 +28,10 @@ public class User {
     @Setter
     private String refreshToken;
 
+    private String provider;
+
+    private String providerId;
+
+    private String name;    // provider에서 받아온 name
+
 }

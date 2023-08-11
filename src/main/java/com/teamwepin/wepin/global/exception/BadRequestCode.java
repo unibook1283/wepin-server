@@ -1,5 +1,6 @@
 package com.teamwepin.wepin.global.exception;
 
+import com.teamwepin.wepin.domain.auth.exception.InvalidProviderNameException;
 import com.teamwepin.wepin.tests.sample.SampleNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,6 +14,9 @@ public enum BadRequestCode {
     NOT_FOUND_ERROR_CODE("COMMON-001", "해당 에러의 에러코드를 찾을 수 없습니다.", NotFoundErrorCodeException.class),
 
     SAMPLE_NOT_FOUND("SAMPLE-001", "존재하지 않는 sample입니다.", SampleNotFoundException.class),
+
+    INVALID_PROVIDER_NAME("USER-003", "유효하지 않은 providerName입니다.", InvalidProviderNameException.class),
+
     ;
 
 

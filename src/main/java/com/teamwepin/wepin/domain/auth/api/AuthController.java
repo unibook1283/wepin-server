@@ -2,6 +2,7 @@ package com.teamwepin.wepin.domain.auth.api;
 
 
 import com.teamwepin.wepin.domain.auth.dto.LoginRes;
+import com.teamwepin.wepin.domain.auth.service.OAuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
 public class AuthController {
+
+    private final OAuthService oAuthService;
 
 //    @Deprecated // filter에서 걸러져서 처리되기 때문에 여기서 처리될 일 없음. swagger를 위해 작성한 api.
     @PostMapping("/login")
@@ -29,7 +32,7 @@ public class AuthController {
     public LoginRes socialLogin(
             @Parameter(description = "프로바이더명. \"kakao\" 또는 \"google\")", required = true) @PathVariable String providerName,
             @Parameter(description = "resource server로부터 얻은 access token", required = true) @RequestParam String accessToken) {
-        return LoginRes.builder().build();
+        return oAuthService.login(providerName, accessToken);
     }
 
 }

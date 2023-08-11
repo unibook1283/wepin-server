@@ -29,15 +29,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final List<String> EXCLUDE_URL =
             Collections.unmodifiableList(
                     Arrays.asList(
-                            "/api/v1/users/join",
-                            "/api/v1/login"
+                            "/api/v1/users/join"
                     ));
-    private static final List<String> SWAGGER_PREFIX_WHITELIST =
+    private static final List<String> EXCLUDE_URL_PREFIX =
             Collections.unmodifiableList(
                     Arrays.asList(
                             "/v3/api-docs",
-                            "/swagger-ui"
-                    ));
+                            "/swagger-ui",
+                            "/api/v1/login"
+                            ));
 
 
     @Override
@@ -88,7 +88,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         return EXCLUDE_URL.stream().anyMatch(exclude -> exclude.equalsIgnoreCase(request.getServletPath()))
-                || SWAGGER_PREFIX_WHITELIST.stream().anyMatch(excludePrefix -> request.getServletPath().startsWith(excludePrefix));
+                || EXCLUDE_URL_PREFIX.stream().anyMatch(excludePrefix -> request.getServletPath().startsWith(excludePrefix));
     }
 
 }
