@@ -2,6 +2,7 @@ package com.teamwepin.wepin.domain.auth.api;
 
 
 import com.teamwepin.wepin.domain.auth.dto.LoginRes;
+import com.teamwepin.wepin.domain.auth.dto.SocialLoginRes;
 import com.teamwepin.wepin.domain.auth.service.OAuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -29,8 +30,8 @@ public class AuthController {
 
     @PostMapping("/login/oauth/{providerName}")
     @Operation(summary = "소셜 로그인", description = "카카오/구글 소셜 로그인")
-    public LoginRes socialLogin(
-            @Parameter(description = "프로바이더명. \"kakao\" 또는 \"google\")", required = true) @PathVariable String providerName,
+    public SocialLoginRes socialLogin(
+            @Parameter(description = "프로바이더명. \"kakao\" 또는 \"google\"", required = true) @PathVariable String providerName,
             @Parameter(description = "resource server로부터 얻은 access token", required = true) @RequestParam String accessToken) {
         return oAuthService.login(providerName, accessToken);
     }

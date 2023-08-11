@@ -1,6 +1,7 @@
 package com.teamwepin.wepin.domain.auth.service;
 
 import com.teamwepin.wepin.domain.auth.dto.LoginRes;
+import com.teamwepin.wepin.domain.auth.dto.SocialLoginRes;
 import com.teamwepin.wepin.domain.auth.exception.InvalidProviderNameException;
 import com.teamwepin.wepin.domain.auth.support.userinfo.GoogleUserInfo;
 import com.teamwepin.wepin.domain.auth.support.userinfo.KakaoUserInfo;
@@ -29,17 +30,26 @@ public class OAuthService {
     private final JwtService jwtService;
 
     @Transactional
-    public LoginRes login(String providerName, String resourceServerAccessToken) {
+    public SocialLoginRes login(String providerName, String resourceServerAccessToken) {
         checkProviderName(providerName);
         ClientRegistration provider = inMemoryRepository.findByRegistrationId(providerName);
         User user = getUserProfile(providerName, resourceServerAccessToken, provider);
         String username = user.getUsername();
 
+        if (username == null) {
+            return SocialLoginRes.builder()
+                    .userId(user.getId())
+                    .isNew(true)
+                    .build();
+        }
+
         String accessToken = jwtService.createAccessToken(username);
         String refreshToken = jwtService.createRefreshToken(username);
         user.setRefreshToken(refreshToken);
 
-        return LoginRes.builder()
+        return SocialLoginRes.builder()
+                .userId(user.getId())
+                .isNew(false)
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
