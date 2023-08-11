@@ -32,6 +32,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             "/api/v1/users/join",
                             "/api/v1/login"
                     ));
+    private static final List<String> SWAGGER_PREFIX_WHITELIST =
+            Collections.unmodifiableList(
+                    Arrays.asList(
+                            "/v3/api-docs",
+                            "/swagger-ui"
+                    ));
+
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -80,7 +87,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        return EXCLUDE_URL.stream().anyMatch(exclude -> exclude.equalsIgnoreCase(request.getServletPath()));
+        return EXCLUDE_URL.stream().anyMatch(exclude -> exclude.equalsIgnoreCase(request.getServletPath()))
+                || SWAGGER_PREFIX_WHITELIST.stream().anyMatch(excludePrefix -> request.getServletPath().startsWith(excludePrefix));
     }
 
 }
