@@ -1,6 +1,7 @@
 package com.teamwepin.wepin.domain.user.api;
 
 import com.teamwepin.wepin.domain.user.application.UserService;
+import com.teamwepin.wepin.domain.user.dto.JoinRes;
 import com.teamwepin.wepin.domain.user.dto.UserReq;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -23,7 +24,7 @@ public class UserController {
 
     @PostMapping("/users/join")
     @Operation(summary = "회원가입", description = "회원가입 api. return value 고칠 것.")
-    public Long join(
+    public JoinRes join(
             @Parameter(description = "회원가입에 필요한 정보", required = true) @RequestBody UserReq userReq) {
         // password encoding
         String encodedPassword = passwordEncoder.encode(userReq.getPassword());

@@ -1,5 +1,6 @@
 package com.teamwepin.wepin.domain.user.entity;
 
+import com.teamwepin.wepin.domain.user.dto.UserReq;
 import lombok.*;
 
 import javax.persistence.Column;
@@ -33,5 +34,11 @@ public class User {
     private String providerId;
 
     private String name;    // provider에서 받아온 name
+
+    public void addUserInfo(UserReq userReq) {
+        this.username = userReq.getUsername();
+        this.password = userReq.getPassword();
+        this.email = userReq.getEmail();
+    }
 
 }

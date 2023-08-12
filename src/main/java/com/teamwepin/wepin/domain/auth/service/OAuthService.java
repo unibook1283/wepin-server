@@ -1,22 +1,25 @@
 package com.teamwepin.wepin.domain.auth.service;
 
-import com.teamwepin.wepin.domain.auth.dto.LoginRes;
 import com.teamwepin.wepin.domain.auth.dto.SocialLoginRes;
 import com.teamwepin.wepin.domain.auth.exception.InvalidProviderNameException;
 import com.teamwepin.wepin.domain.auth.support.userinfo.GoogleUserInfo;
 import com.teamwepin.wepin.domain.auth.support.userinfo.KakaoUserInfo;
 import com.teamwepin.wepin.domain.auth.support.userinfo.OAuth2UserInfo;
 import com.teamwepin.wepin.domain.jwt.application.JwtService;
+import com.teamwepin.wepin.domain.jwt.exception.CustomJwtException;
+import com.teamwepin.wepin.domain.jwt.exception.JwtError;
 import com.teamwepin.wepin.domain.user.dao.UserRepository;
 import com.teamwepin.wepin.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.util.Map;
 
@@ -83,6 +86,9 @@ public class OAuthService {
                 .uri(provider.getProviderDetails().getUserInfoEndpoint().getUri())
                 .headers(header -> header.setBearerAuth(resourceServerAccessToken))
                 .retrieve()
+                .onStatus(HttpStatus::isError, clientResponse -> clientResponse.bodyToMono(String.class)
+                        .flatMap(error ->
+                                Mono.error(new CustomJwtException(JwtError.JWT_TOKEN_NOT_VALID))))  // 토큰 말고 다른 문제일 수도 있는데
                 .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {
                 })
                 .block();

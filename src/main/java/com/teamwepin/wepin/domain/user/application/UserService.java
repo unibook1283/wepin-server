@@ -1,20 +1,50 @@
 package com.teamwepin.wepin.domain.user.application;
 
+import com.teamwepin.wepin.domain.jwt.application.JwtService;
 import com.teamwepin.wepin.domain.user.dao.UserRepository;
+import com.teamwepin.wepin.domain.user.dto.JoinRes;
 import com.teamwepin.wepin.domain.user.dto.UserReq;
 import com.teamwepin.wepin.domain.user.entity.User;
+import com.teamwepin.wepin.domain.user.exception.UserAlreadyJoinedException;
+import com.teamwepin.wepin.domain.user.exception.UserNotFoundException;
+import com.teamwepin.wepin.domain.user.exception.UsernameExistException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
+    private final JwtService jwtService;
 
-    public Long join(UserReq userReq) {
-        User user = userRepository.save(userReq.toEntity());
-        return user.getId();
+    @Transactional
+    public JoinRes join(UserReq userReq) {
+        if (userRepository.findByUsername(userReq.getUsername()).isPresent()) {
+            throw new UsernameExistException();
+        }
+        User user = null;
+        if (userReq.getUserId() != null) {
+            user = userRepository.findById(userReq.getUserId())
+                    .orElseThrow(UserNotFoundException::new);
+            if (user.getUsername() != null) {
+                throw new UserAlreadyJoinedException();
+            }
+            user.addUserInfo(userReq);
+        } else {
+            user = userRepository.save(userReq.toEntity());
+        }
+
+        String accessToken = jwtService.createAccessToken(user.getUsername());
+        String refreshToken = jwtService.createRefreshToken(user.getUsername());
+        user.setRefreshToken(refreshToken);
+
+        return JoinRes.builder()
+                .userId(user.getId())
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
     }
 
 }
