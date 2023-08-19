@@ -1,12 +1,12 @@
 package com.teamwepin.wepin.domain.user.entity;
 
+import com.teamwepin.wepin.domain.chat.entity.UserChatRoom;
 import com.teamwepin.wepin.domain.user.dto.UserReq;
 import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -34,6 +34,14 @@ public class User {
     private String providerId;
 
     private String name;    // provider에서 받아온 name
+
+    @OneToMany(mappedBy = "user")
+    private List<UserChatRoom> userChatRooms = new ArrayList<>();
+
+    public void enterChatRoom(UserChatRoom userChatRoom) {
+        userChatRooms.add(userChatRoom);
+        userChatRoom.setUser(this);
+    }
 
     public void addUserInfo(UserReq userReq) {
         this.username = userReq.getUsername();
