@@ -4,15 +4,11 @@ import com.teamwepin.wepin.domain.chat.application.ChatService;
 import com.teamwepin.wepin.domain.chat.dto.ChatRoomJoinReq;
 import com.teamwepin.wepin.domain.chat.dto.ChatRoomReq;
 import com.teamwepin.wepin.domain.chat.dto.ChatRoomRes;
-import com.teamwepin.wepin.domain.user.dto.JoinRes;
-import com.teamwepin.wepin.domain.user.dto.UserReq;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Tag(name = "채팅")
 @RestController

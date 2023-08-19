@@ -1,6 +1,7 @@
 package com.teamwepin.wepin.domain.chat.entity;
 
 
+import com.teamwepin.wepin.global.support.BaseTimeEntity;
 import lombok.*;
 
 import javax.persistence.*;
@@ -10,7 +11,7 @@ import javax.persistence.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChatMessage {
+public class ChatMessage extends BaseTimeEntity {
 
     @Id
     @GeneratedValue

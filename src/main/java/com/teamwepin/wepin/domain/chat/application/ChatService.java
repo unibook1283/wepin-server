@@ -5,6 +5,7 @@ import com.teamwepin.wepin.domain.chat.dao.ChatRoomRepository;
 import com.teamwepin.wepin.domain.chat.dao.UserChatRoomRepository;
 import com.teamwepin.wepin.domain.chat.dto.ChatRoomReq;
 import com.teamwepin.wepin.domain.chat.dto.ChatRoomRes;
+import com.teamwepin.wepin.domain.chat.entity.ChatMessage;
 import com.teamwepin.wepin.domain.chat.entity.ChatRoom;
 import com.teamwepin.wepin.domain.chat.entity.UserChatRoom;
 import com.teamwepin.wepin.domain.chat.exception.ChatRoomNotFoundException;
@@ -65,4 +66,5 @@ public class ChatService {
                 .orElseThrow(ChatRoomNotFoundException::new);
         return ChatRoomRes.of(chatRoom);
     }
+
 }
