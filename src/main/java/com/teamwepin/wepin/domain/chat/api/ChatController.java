@@ -10,6 +10,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Tag(name = "채팅")
 @RestController
 @RequiredArgsConstructor
@@ -26,10 +28,17 @@ public class ChatController {
     }
 
     @GetMapping("/chatRoom/{chatRoomId}")
-    @Operation(summary = "채팅방 조회", description = "채팅방 조회")
+    @Operation(summary = "채팅방 조회", description = "채팅방 id로 하나의 채팅방 조회")
     public ChatRoomRes getChatRoom(
             @Parameter(required = true) @PathVariable Long chatRoomId) {
         return chatService.getChatRoom(chatRoomId);
+    }
+
+    @GetMapping("/users/{userId}/chatRoom")
+    @Operation(summary = "유저가 속한 모든 채팅방 조회")
+    public List<ChatRoomRes> getChatRoomsOfUser(
+            @Parameter(required = true) @PathVariable Long userId) {
+        return chatService.getChatRoomsOfUser(userId);
     }
 
     @PostMapping("/chatRoom/{chatRoomId}/join")

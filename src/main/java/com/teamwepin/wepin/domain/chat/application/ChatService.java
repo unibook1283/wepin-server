@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -61,10 +62,23 @@ public class ChatService {
         return ChatRoomRes.of(chatRoom);
     }
 
+    @Transactional(readOnly = true)
     public ChatRoomRes getChatRoom(Long chatRoomId) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(ChatRoomNotFoundException::new);
         return ChatRoomRes.of(chatRoom);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ChatRoomRes> getChatRoomsOfUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
+        List<UserChatRoom> userChatRooms = userChatRoomRepository.findByUser(user);
+
+        return userChatRooms.stream()
+                .map(userChatRoom ->
+                        ChatRoomRes.of(userChatRoom.getChatRoom()))
+                .collect(Collectors.toList());
     }
 
 }
