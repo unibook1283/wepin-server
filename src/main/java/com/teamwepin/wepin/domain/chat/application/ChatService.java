@@ -3,6 +3,8 @@ package com.teamwepin.wepin.domain.chat.application;
 import com.teamwepin.wepin.domain.chat.dao.ChatMessageRepository;
 import com.teamwepin.wepin.domain.chat.dao.ChatRoomRepository;
 import com.teamwepin.wepin.domain.chat.dao.UserChatRoomRepository;
+import com.teamwepin.wepin.domain.chat.dto.ChatMessageReq;
+import com.teamwepin.wepin.domain.chat.dto.ChatMessageRes;
 import com.teamwepin.wepin.domain.chat.dto.ChatRoomReq;
 import com.teamwepin.wepin.domain.chat.dto.ChatRoomRes;
 import com.teamwepin.wepin.domain.chat.entity.ChatMessage;
@@ -79,6 +81,13 @@ public class ChatService {
                 .map(userChatRoom ->
                         ChatRoomRes.of(userChatRoom.getChatRoom()))
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public ChatMessageRes sendChatMessage(Long chatRoomId, ChatMessageReq chatMessageReq) {
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
+                .orElseThrow(ChatRoomNotFoundException::new);
+        return ChatMessageRes.of(chatMessageRepository.save(chatMessageReq.toEntity(chatRoom)));
     }
 
 }
