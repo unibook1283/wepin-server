@@ -11,11 +11,11 @@ import lombok.Getter;
 public class ChatRoomRes {
 
     @Schema(description = "채팅방 id")
-    private Long id;
+    private Long chatRoomId;
 
     public static ChatRoomRes of(ChatRoom chatRoom) {
         return ChatRoomRes.builder()
-                .id(chatRoom.getId())
+                .chatRoomId(chatRoom.getId())
                 .build();
     }
 

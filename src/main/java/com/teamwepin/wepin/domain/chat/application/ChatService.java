@@ -7,7 +7,6 @@ import com.teamwepin.wepin.domain.chat.dto.ChatMessageReq;
 import com.teamwepin.wepin.domain.chat.dto.ChatMessageRes;
 import com.teamwepin.wepin.domain.chat.dto.ChatRoomReq;
 import com.teamwepin.wepin.domain.chat.dto.ChatRoomRes;
-import com.teamwepin.wepin.domain.chat.entity.ChatMessage;
 import com.teamwepin.wepin.domain.chat.entity.ChatRoom;
 import com.teamwepin.wepin.domain.chat.entity.UserChatRoom;
 import com.teamwepin.wepin.domain.chat.exception.ChatRoomNotFoundException;
@@ -87,7 +86,10 @@ public class ChatService {
     public ChatMessageRes sendChatMessage(Long chatRoomId, ChatMessageReq chatMessageReq) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(ChatRoomNotFoundException::new);
-        return ChatMessageRes.of(chatMessageRepository.save(chatMessageReq.toEntity(chatRoom)));
+        User user = userRepository.findById(chatMessageReq.getSenderId())
+                .orElseThrow(UserNotFoundException::new);
+
+        return ChatMessageRes.of(chatMessageRepository.save(chatMessageReq.toEntity(chatRoom, user)));
     }
 
 }
