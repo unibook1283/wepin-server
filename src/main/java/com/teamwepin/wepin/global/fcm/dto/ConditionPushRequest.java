@@ -10,28 +10,29 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Getter
-@Builder
-public class ConditionPushRequest implements SingleFcmMessage {
-
-    // notification
-    private String title;
-    private String body;
-
-    @Builder.Default
-    private Map<String, String> data = new HashMap<>();
+public class ConditionPushRequest extends SingleFcmMessage {
 
     @NonNull
-    private String condition;
+    private final String condition;
+
+    @Builder
+    public ConditionPushRequest(String title, String body, Map<String, String> data, String condition) {
+        super(title, body);
+        if (data != null) {
+            getData().putAll(data);
+        }
+        this.condition = condition;
+    }
 
     @Override
     public Message toMessage() {
         return Message.builder()
                 .setNotification(Notification.builder()
-                        .setTitle(title)
-                        .setBody(body)
+                        .setTitle(getTitle())
+                        .setBody(getBody())
                         .build())
                 .setCondition(condition)
-                .putAllData(data)
+                .putAllData(getData())
                 .build();
     }
 

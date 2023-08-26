@@ -6,32 +6,32 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Getter
-@Builder
-public class TokenPushRequest implements SingleFcmMessage {
-
-    // notification
-    private String title;
-    private String body;
-
-    @Builder.Default
-    private Map<String, String> data = new HashMap<>();
+public class TokenPushRequest extends SingleFcmMessage {
 
     @NonNull
-    private String token;
+    private final String token;
+
+    @Builder
+    public TokenPushRequest(String title, String body, Map<String, String> data, String token) {
+        super(title, body);
+        if (data != null) {
+            getData().putAll(data);
+        }
+        this.token = token;
+    }
 
     @Override
     public Message toMessage() {
         return Message.builder()
                 .setNotification(Notification.builder()
-                        .setTitle(title)
-                        .setBody(body)
+                        .setTitle(getTitle())
+                        .setBody(getBody())
                         .build())
                 .setToken(token)
-                .putAllData(data)
+                .putAllData(getData())
                 .build();
     }
 

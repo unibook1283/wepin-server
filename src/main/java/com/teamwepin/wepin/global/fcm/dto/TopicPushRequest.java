@@ -6,32 +6,32 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Getter
-@Builder
-public class TopicPushRequest implements SingleFcmMessage {
-
-    // notification
-    private String title;
-    private String body;
-
-    @Builder.Default
-    private Map<String, String> data = new HashMap<>();
+public class TopicPushRequest extends SingleFcmMessage {
 
     @NonNull
-    private String topic;
+    private final String topic;
+
+    @Builder
+    public TopicPushRequest(String title, String body, Map<String, String> data, String topic) {
+        super(title, body);
+        if (data != null) {
+            getData().putAll(data);
+        }
+        this.topic = topic;
+    }
 
     @Override
     public Message toMessage() {
         return Message.builder()
                 .setNotification(Notification.builder()
-                        .setTitle(title)
-                        .setBody(body)
+                        .setTitle(getTitle())
+                        .setBody(getBody())
                         .build())
                 .setTopic(topic)
-                .putAllData(data)
+                .putAllData(getData())
                 .build();
     }
 

@@ -11,27 +11,28 @@ import java.util.List;
 import java.util.Map;
 
 @Getter
-@Builder
-public class MulticastMessagePushRequest implements MulticastFcmMessage {
-
-    // notification
-    private String title;
-    private String body;
-
-    @Builder.Default
-    private Map<String, String> data = new HashMap<>();
+public class MulticastMessagePushRequest extends MulticastFcmMessage {
 
     @NonNull
-    private List<String> tokens;
+    private final List<String> tokens;
+
+    @Builder
+    public MulticastMessagePushRequest(String title, String body, Map<String, String> data, List<String> tokens) {
+        super(title, body);
+        if (data != null) {
+            getData().putAll(data);
+        }
+        this.tokens = tokens;
+    }
 
     public MulticastMessage toMessage() {
         return MulticastMessage.builder()
                 .setNotification(Notification.builder()
-                        .setTitle(title)
-                        .setBody(body)
+                        .setTitle(getTitle())
+                        .setBody(getBody())
                         .build())
                 .addAllTokens(tokens)
-                .putAllData(data)
+                .putAllData(getData())
                 .build();
     }
 
