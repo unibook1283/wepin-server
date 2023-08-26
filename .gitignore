@@ -40,3 +40,4 @@ out/
 **/application-local.properties
 **/application-auth.yml
 **/application-jwt.yml
+**/fcm/service-account.json
