@@ -2,6 +2,7 @@ package com.teamwepin.wepin.domain.user.application;
 
 import com.teamwepin.wepin.domain.jwt.application.JwtService;
 import com.teamwepin.wepin.domain.user.dao.UserRepository;
+import com.teamwepin.wepin.domain.user.dto.FcmTokenReq;
 import com.teamwepin.wepin.domain.user.dto.JoinRes;
 import com.teamwepin.wepin.domain.user.dto.UserReq;
 import com.teamwepin.wepin.domain.user.entity.User;
@@ -11,6 +12,9 @@ import com.teamwepin.wepin.domain.user.exception.UsernameExistException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +49,14 @@ public class UserService {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
+    }
+
+    @Transactional
+    public void saveFcmToken(Long userId, FcmTokenReq fcmTokenReq) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
+        user.setFcmToken(fcmTokenReq.getFcmToken());
+        user.setFcmTokenModifiedAt(LocalDateTime.now());
     }
 
 }
