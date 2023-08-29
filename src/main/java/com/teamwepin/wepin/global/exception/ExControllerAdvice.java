@@ -1,6 +1,7 @@
 package com.teamwepin.wepin.global.exception;
 
 import com.teamwepin.wepin.domain.jwt.exception.CustomJwtException;
+import com.teamwepin.wepin.global.response.dto.ErrorResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;

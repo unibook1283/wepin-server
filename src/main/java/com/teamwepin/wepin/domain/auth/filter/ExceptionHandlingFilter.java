@@ -2,7 +2,7 @@ package com.teamwepin.wepin.domain.auth.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.teamwepin.wepin.domain.jwt.exception.CustomJwtException;
-import com.teamwepin.wepin.global.exception.ErrorResult;
+import com.teamwepin.wepin.global.response.dto.ErrorResult;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
