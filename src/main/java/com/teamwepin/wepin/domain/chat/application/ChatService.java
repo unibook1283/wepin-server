@@ -104,6 +104,7 @@ public class ChatService {
         List<UserChatRoom> userChatRooms = userChatRoomRepository.findByChatRoom(chatRoom);
         List<String> userTokens = userChatRooms.stream()
                 .map(userChatRoom -> userChatRoom.getUser().getFcmToken())
+                .filter(Objects::nonNull)   // fcmToken이 null이면 pass
                 .collect(Collectors.toList());
         Map<String, String> data = new HashMap<String, String>() {{
             put("chatRoomId", chatRoom.getId().toString());
