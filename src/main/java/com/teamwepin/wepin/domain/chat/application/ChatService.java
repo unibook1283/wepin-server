@@ -17,12 +17,14 @@ import com.teamwepin.wepin.domain.user.exception.UserNotFoundException;
 import com.teamwepin.wepin.global.fcm.FcmService;
 import com.teamwepin.wepin.global.fcm.dto.MulticastMessagePushRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChatService {
@@ -48,7 +50,7 @@ public class ChatService {
     }
 
     @Transactional
-    public ChatRoomRes joinChatRoom(Long chatRoomId, List<Long> userIds) {
+    public void joinChatRoom(Long chatRoomId, List<Long> userIds) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(ChatRoomNotFoundException::new);
 
@@ -62,8 +64,6 @@ public class ChatService {
                     user.enterChatRoom(userChatRoom);
                     chatRoom.addUserChatRoom(userChatRoom);
                 });
-
-        return ChatRoomRes.of(chatRoom);
     }
 
     @Transactional(readOnly = true)
@@ -92,26 +92,32 @@ public class ChatService {
         User user = userRepository.findById(chatMessageReq.getSenderId())
                 .orElseThrow(UserNotFoundException::new);
 
-        ChatMessage chatMessage = chatMessageRepository.save(chatMessageReq.toEntity(chatRoom, user));
+        ChatMessage chatMessage = chatMessageReq.toEntity(chatRoom, user);
 
-        // 푸시 알림
-        sendChatMessagePushNotification(chatRoom, user, chatMessage);
+        chatMessageRepository.save(chatMessage);
 
+        try {
+            sendChatMessagePushNotification(chatRoom, user, chatMessage);
+        } catch (Exception e) {
+            log.error("푸시 알림 전송 중 예외 발생. 정상 흐름 변환.");
+            e.printStackTrace();
+        }
         return ChatMessageRes.of(chatMessage);
     }
 
-    private void sendChatMessagePushNotification(ChatRoom chatRoom, User user, ChatMessage chatMessage) {
+    private void sendChatMessagePushNotification(ChatRoom chatRoom, User sender, ChatMessage chatMessage) {
         List<UserChatRoom> userChatRooms = userChatRoomRepository.findByChatRoom(chatRoom);
         List<String> userTokens = userChatRooms.stream()
+                .filter(userChatRoom -> !userChatRoom.getUser().getId().equals(sender.getId()))   // sender는 제외
                 .map(userChatRoom -> userChatRoom.getUser().getFcmToken())
-                .filter(Objects::nonNull)   // fcmToken이 null이면 pass
+                .filter(Objects::nonNull)   // user의 fcmToken이 null이면 pass
                 .collect(Collectors.toList());
         Map<String, String> data = new HashMap<String, String>() {{
             put("chatRoomId", chatRoom.getId().toString());
             put("chatMessageCreatedAt", chatMessage.getCreatedAt().toString());
         }};
         fcmService.sendMessage(MulticastMessagePushRequest.builder()
-                .title(user.getUsername())
+                .title(sender.getUsername())
                 .body(chatMessage.getMessage())
                 .tokens(userTokens)
                 .data(data) // 채팅방 정보

@@ -26,6 +26,7 @@ public class ChatMessage extends BaseTimeEntity {
     @OneToOne(fetch = FetchType.LAZY)
     private User user;
 
+    @Enumerated(EnumType.STRING)
     private MessageType messageType;
 
     private String message;
