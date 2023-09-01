@@ -22,12 +22,11 @@ public class AuthController {
     private final ResponseService responseService;
 
 //    @Deprecated // filter에서 걸러져서 처리되기 때문에 여기서 처리될 일 없음. swagger를 위해 작성한 api.
-    @PostMapping("/login")
+    @PostMapping("/login/email")
     @Operation(summary = "기존 계정 로그인", description = "소셜 없이 하는 로그인")
     public SingleResult<LoginRes> existingAccountLogin(
-            @Parameter(description = "아이디", required = true) @RequestParam String username,
-            @Parameter(description = "비밀번호", required = true) @RequestParam String password
-    ) {
+            @Parameter(description = "이메일", required = true) @RequestParam String email,
+            @Parameter(description = "비밀번호", required = true) @RequestParam String password) {
         return responseService.getSingleResult(LoginRes.builder().build());
     }
 

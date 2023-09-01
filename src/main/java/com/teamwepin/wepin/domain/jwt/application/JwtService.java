@@ -91,10 +91,11 @@ public class JwtService {
     }
 
     @Transactional
-    public void setRefreshTokenToUser(String username, String refreshToken) {
-        userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("username에 해당하는 유저를 찾을 수 없습니다."))
-                .setRefreshToken(refreshToken);
+    public Long setRefreshTokenToUser(String username, String refreshToken) {
+        User user = userRepository.findByEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("username에 해당하는 유저를 찾을 수 없습니다."));
+        user.setRefreshToken(refreshToken);
+        return user.getId();
     }
 
 }

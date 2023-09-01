@@ -23,7 +23,7 @@ public class CustomUsernamePasswordAuthenticationProvider implements Authenticat
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String username = authentication.getName();
         String password = authentication.getCredentials().toString();
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("유저를 찾을 수 없습니다."));
         if (passwordEncoder.matches(password, user.getPassword())) {
 //            return UsernamePasswordAuthenticationToken.authenticated(username, password, );   // isAuthenticated...

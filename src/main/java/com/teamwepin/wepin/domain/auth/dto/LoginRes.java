@@ -7,6 +7,7 @@ import lombok.Getter;
 @Getter
 public class LoginRes {
 
+    private Long userId;
     private String accessToken;
     private String refreshToken;
 

@@ -117,7 +117,7 @@ public class ChatService {
             put("chatMessageCreatedAt", chatMessage.getCreatedAt().toString());
         }};
         fcmService.sendMessage(MulticastMessagePushRequest.builder()
-                .title(sender.getUsername())
+                .title(sender.getNickname())
                 .body(chatMessage.getMessage())
                 .tokens(userTokens)
                 .data(data) // 채팅방 정보

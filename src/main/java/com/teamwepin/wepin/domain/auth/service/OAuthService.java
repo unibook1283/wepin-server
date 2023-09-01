@@ -37,21 +37,22 @@ public class OAuthService {
         checkProviderName(providerName);
         ClientRegistration provider = inMemoryRepository.findByRegistrationId(providerName);
         User user = getUserProfile(providerName, resourceServerAccessToken, provider);
-        String username = user.getUsername();
+        Long userId = user.getId();
+        String email = user.getEmail();
 
-        if (username == null) {
+        if (email == null) {
             return SocialLoginRes.builder()
-                    .userId(user.getId())
+                    .userId(userId)
                     .isNew(true)
                     .build();
         }
 
-        String accessToken = jwtService.createAccessToken(username);
-        String refreshToken = jwtService.createRefreshToken(username);
+        String accessToken = jwtService.createAccessToken(userId.toString());
+        String refreshToken = jwtService.createRefreshToken(userId.toString());
         user.setRefreshToken(refreshToken);
 
         return SocialLoginRes.builder()
-                .userId(user.getId())
+                .userId(userId)
                 .isNew(false)
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)

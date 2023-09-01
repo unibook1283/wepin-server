@@ -21,11 +21,11 @@ public class User {
     @Column(name = "user_id")
     private Long id;
 
-    private String username;
+    private String email;
 
     private String password;
 
-    private String email;
+    private String nickname;
 
     @Setter
     private String refreshToken;
@@ -51,9 +51,8 @@ public class User {
     }
 
     public void addUserInfo(UserReq userReq) {
-        this.username = userReq.getUsername();
-        this.password = userReq.getPassword();
         this.email = userReq.getEmail();
+        this.password = userReq.getPassword();
     }
 
 }

@@ -68,7 +68,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 log.info("[AUTH][TOKEN] refresh token을 검증하여 access token 재발급.");
                 String username = jwtService.getPayload(refreshToken);
                 // user db 조회하여 refresh token 검증.
-                User user = userRepository.findByUsername(username)
+                User user = userRepository.findByEmail(username)
                         .orElseThrow(() -> new CustomJwtException(JwtError.JWT_REFRESH_NOT_VALID));
                 if (user.getRefreshToken() == null || !user.getRefreshToken().equals(refreshToken)) { // user.getRefreshToken() null check 필요.
                     log.info("[AUTH][TOKEN] refresh token 불일치.");

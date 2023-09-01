@@ -8,13 +8,12 @@ import com.teamwepin.wepin.domain.user.dto.UserReq;
 import com.teamwepin.wepin.domain.user.entity.User;
 import com.teamwepin.wepin.domain.user.exception.UserAlreadyJoinedException;
 import com.teamwepin.wepin.domain.user.exception.UserNotFoundException;
-import com.teamwepin.wepin.domain.user.exception.UsernameExistException;
+import com.teamwepin.wepin.domain.user.exception.EmailExistException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
@@ -25,14 +24,14 @@ public class UserService {
 
     @Transactional
     public JoinRes join(UserReq userReq) {
-        if (userRepository.findByUsername(userReq.getUsername()).isPresent()) {
-            throw new UsernameExistException();
+        if (userRepository.findByEmail(userReq.getEmail()).isPresent()) {
+            throw new EmailExistException();
         }
         User user = null;
         if (userReq.getUserId() != null) {
             user = userRepository.findById(userReq.getUserId())
                     .orElseThrow(UserNotFoundException::new);
-            if (user.getUsername() != null) {
+            if (user.getEmail() != null) {
                 throw new UserAlreadyJoinedException();
             }
             user.addUserInfo(userReq);
@@ -40,8 +39,8 @@ public class UserService {
             user = userRepository.save(userReq.toEntity());
         }
 
-        String accessToken = jwtService.createAccessToken(user.getUsername());
-        String refreshToken = jwtService.createRefreshToken(user.getUsername());
+        String accessToken = jwtService.createAccessToken(user.getEmail());
+        String refreshToken = jwtService.createRefreshToken(user.getEmail());
         user.setRefreshToken(refreshToken);
 
         return JoinRes.builder()

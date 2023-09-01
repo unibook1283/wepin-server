@@ -25,7 +25,7 @@ public class UserController {
     private final ResponseService responseService;
 
     @PostMapping("/users/join")
-    @Operation(summary = "회원가입", description = "회원가입 api. return value 고칠 것.")
+    @Operation(summary = "회원가입", description = "회원가입 api")
     public SingleResult<JoinRes> join(
             @Parameter(description = "회원가입에 필요한 정보", required = true) @RequestBody UserReq userReq) {
         // password encoding
