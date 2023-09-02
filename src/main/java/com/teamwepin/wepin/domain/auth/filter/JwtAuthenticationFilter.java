@@ -43,29 +43,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         log.info("[AUTH] token 기반 인증 시도");
-        String accessToken = jwtService.getTokenFromRequest(request, AuthConstants.ACCESS_TOKEN_HEADER);
-        String refreshToken = jwtService.getTokenFromRequest(request, AuthConstants.REFRESH_TOKEN_HEADER);
+        String accessToken = jwtService.getAccessTokenFromRequest(request);
         log.info("accessToken : {}", accessToken);
+        String refreshToken = jwtService.getRefreshTokenFromRequest(request);
         log.info("refreshToken : {}", refreshToken);
 
         if (jwtService.validateToken(accessToken)) {
             log.info("[AUTH][TOKEN] 유효한 access token");
             String username = jwtService.getPayload(accessToken);
             log.info("[AUTH][TOKEN] username : {}", username);
-            if (jwtService.validateToken(refreshToken)) {
-                log.info("[AUTH][TOKEN] 유효한 refresh token");
-                log.info("[AUTH][TOKEN] 정상 처리");
-
-            } else {
-                log.info("[AUTH][TOKEN] 만료된 refresh token. 재발급.");
-                String newRefreshToken = jwtService.createRefreshToken(username);
-                response.addHeader(AuthConstants.REFRESH_TOKEN_HEADER, AuthConstants.TOKEN_PREFIX + newRefreshToken);
-            }
+            log.info("[AUTH][TOKEN] 정상 처리");
         } else {
             log.info("[AUTH][TOKEN] 만료된 access token.");
             if (jwtService.validateToken(refreshToken)) {
                 log.info("[AUTH][TOKEN] 유효한 refresh token");
-                log.info("[AUTH][TOKEN] refresh token을 검증하여 access token 재발급.");
                 String username = jwtService.getPayload(refreshToken);
                 // user db 조회하여 refresh token 검증.
                 User user = userRepository.findByEmail(username)
@@ -75,11 +66,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     throw new CustomJwtException(JwtError.JWT_REFRESH_NOT_VALID);
                 }
                 String newAccessToken = jwtService.createAccessToken(username);
-                response.addHeader(AuthConstants.ACCESS_TOKEN_HEADER, AuthConstants.TOKEN_PREFIX + newAccessToken);
+                response.addHeader(AuthConstants.ACCESS_TOKEN_HEADER, AuthConstants.ACCESS_TOKEN_PREFIX + newAccessToken);
+                log.info("[AUTH][TOKEN] refresh token 검증 완료. access token 재발급.");
             } else {
-                log.info("[AUTH][TOKEN] 만료된 refresh token.");
-                log.info("[AUTH][TOKEN] 재로그인하여 accessToken, refreshToken 재발급 필요.");
-                throw new CustomJwtException(JwtError.JWT_BOTH_TOKEN_EXPIRED);
+                log.info("[AUTH][TOKEN] 만료된 refresh token. 재로그인하여 accessToken, refreshToken 재발급 필요.");
+                throw new CustomJwtException(JwtError.JWT_REFRESH_TOKEN_EXPIRED);
             }
         }
         filterChain.doFilter(request, response);

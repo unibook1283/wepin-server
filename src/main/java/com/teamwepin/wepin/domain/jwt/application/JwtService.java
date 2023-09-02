@@ -15,6 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
+import static com.teamwepin.wepin.domain.auth.support.AuthConstants.ACCESS_TOKEN_HEADER;
+import static com.teamwepin.wepin.domain.auth.support.AuthConstants.REFRESH_TOKEN_HEADER;
+
 @Service
 @RequiredArgsConstructor
 public class JwtService {
@@ -78,16 +81,20 @@ public class JwtService {
         }
     }
 
-    /**
-     * HttpServletRequest의 header에서 jwt token을 추출한다.
-     * 추출할 수 없을 경우, exception 발생
-     */
-    public String getTokenFromRequest(HttpServletRequest request, String tokenHeaderName) {
-        String headerValue = request.getHeader(tokenHeaderName);
-        if (headerValue == null || !headerValue.startsWith(AuthConstants.TOKEN_PREFIX)) {
-            throw new CustomJwtException(JwtError.JWT_HEADER_NOT_VALID);
+    public String getAccessTokenFromRequest(HttpServletRequest request) {
+        String headerValue = request.getHeader(ACCESS_TOKEN_HEADER);
+        if (headerValue == null || !headerValue.startsWith(AuthConstants.ACCESS_TOKEN_PREFIX)) {
+            throw new CustomJwtException(JwtError.JWT_ACCESS_NOT_VALID);
         }
-        return headerValue.replace(AuthConstants.TOKEN_PREFIX, "");
+        return headerValue.replace(AuthConstants.ACCESS_TOKEN_PREFIX, "");
+    }
+
+    public String getRefreshTokenFromRequest(HttpServletRequest request) {
+        String headerValue = request.getHeader(REFRESH_TOKEN_HEADER);
+        if (headerValue == null) {
+            throw new CustomJwtException(JwtError.JWT_REFRESH_NOT_VALID);
+        }
+        return headerValue;
     }
 
     @Transactional
