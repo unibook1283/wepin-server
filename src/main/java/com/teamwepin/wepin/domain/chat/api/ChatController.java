@@ -1,6 +1,7 @@
 package com.teamwepin.wepin.domain.chat.api;
 
 import com.teamwepin.wepin.domain.chat.application.ChatService;
+import com.teamwepin.wepin.domain.chat.dto.ChatRoomCreateRes;
 import com.teamwepin.wepin.domain.chat.dto.ChatRoomJoinReq;
 import com.teamwepin.wepin.domain.chat.dto.ChatRoomReq;
 import com.teamwepin.wepin.domain.chat.dto.ChatRoomRes;
@@ -25,16 +26,9 @@ public class ChatController {
 
     @PostMapping("/chatRoom")
     @Operation(summary = "채팅방 생성", description = "채팅방 생성")
-    public SingleResult<ChatRoomRes> createChatRoom(
+    public SingleResult<ChatRoomCreateRes> createChatRoom(
             @Parameter(required = true) @RequestBody ChatRoomReq chatRoomReq) {
         return responseService.getSingleResult(chatService.createChatRoom(chatRoomReq));
-    }
-
-    @GetMapping("/chatRoom/{chatRoomId}")
-    @Operation(summary = "채팅방 조회", description = "채팅방 id로 하나의 채팅방 조회")
-    public SingleResult<ChatRoomRes> getChatRoom(
-            @Parameter(required = true) @PathVariable Long chatRoomId) {
-        return responseService.getSingleResult(chatService.getChatRoom(chatRoomId));
     }
 
     @GetMapping("/users/{userId}/chatRoom")

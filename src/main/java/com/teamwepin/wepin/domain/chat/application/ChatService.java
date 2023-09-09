@@ -3,10 +3,7 @@ package com.teamwepin.wepin.domain.chat.application;
 import com.teamwepin.wepin.domain.chat.dao.ChatMessageRepository;
 import com.teamwepin.wepin.domain.chat.dao.ChatRoomRepository;
 import com.teamwepin.wepin.domain.chat.dao.UserChatRoomRepository;
-import com.teamwepin.wepin.domain.chat.dto.ChatMessageReq;
-import com.teamwepin.wepin.domain.chat.dto.ChatMessageRes;
-import com.teamwepin.wepin.domain.chat.dto.ChatRoomReq;
-import com.teamwepin.wepin.domain.chat.dto.ChatRoomRes;
+import com.teamwepin.wepin.domain.chat.dto.*;
 import com.teamwepin.wepin.domain.chat.entity.ChatMessage;
 import com.teamwepin.wepin.domain.chat.entity.ChatRoom;
 import com.teamwepin.wepin.domain.chat.entity.UserChatRoom;
@@ -21,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -36,7 +34,7 @@ public class ChatService {
     private final FcmService fcmService;
 
     @Transactional
-    public ChatRoomRes createChatRoom(ChatRoomReq chatRoomReq) {
+    public ChatRoomCreateRes createChatRoom(ChatRoomReq chatRoomReq) {
         ChatRoom chatRoom = ChatRoom.builder()
                 .userChatRooms(new ArrayList<>())
                 .chatMessages(new ArrayList<>())
@@ -46,7 +44,7 @@ public class ChatService {
         List<Long> userIds = chatRoomReq.getUserIds();
         joinChatRoom(chatRoom.getId(), userIds);
 
-        return ChatRoomRes.of(chatRoom);
+        return ChatRoomCreateRes.of(chatRoom);
     }
 
     @Transactional
@@ -67,21 +65,33 @@ public class ChatService {
     }
 
     @Transactional(readOnly = true)
-    public ChatRoomRes getChatRoom(Long chatRoomId) {
-        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(ChatRoomNotFoundException::new);
-        return ChatRoomRes.of(chatRoom);
-    }
-
-    @Transactional(readOnly = true)
     public List<ChatRoomRes> getChatRoomsOfUser(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
         List<UserChatRoom> userChatRooms = userChatRoomRepository.findByUser(user);
 
         return userChatRooms.stream()
-                .map(userChatRoom ->
-                        ChatRoomRes.of(userChatRoom.getChatRoom()))
+                .map(userChatRoom -> {
+                    ChatRoom chatRoom = userChatRoom.getChatRoom();
+                    List<UserChatRoom> otherUserChatRooms = userChatRoom.getChatRoom().getUserChatRooms().stream()
+                            .filter(userChatRoom1 -> !userChatRoom1.getUser().getId().equals(userId))
+                            .collect(Collectors.toList());
+                    User otherUser = otherUserChatRooms.get(0).getUser();
+                    String otherUserNickname = otherUser.getNickname();
+
+                    ChatMessage lastChatMessage = chatMessageRepository.findFirstByChatRoomOrderByCreatedAtDesc(chatRoom);
+                    String lastMessageText = lastChatMessage != null ? lastChatMessage.getMessage() : null;
+                    LocalDateTime lastChatTime = lastChatMessage != null ? lastChatMessage.getCreatedAt() : null;
+
+                    return ChatRoomRes.builder()
+                            .chatRoomId(chatRoom.getId())
+                            .chatRoomName(otherUserNickname)
+                            .lastChatMessage(lastMessageText)
+                            .lastChatTime(lastChatTime)
+                            .chatRoomImage("image")
+                            .unreadCount(userChatRoom.getUnreadCount())
+                            .build();
+                })
                 .collect(Collectors.toList());
     }
 
@@ -89,15 +99,19 @@ public class ChatService {
     public ChatMessageRes sendChatMessage(Long chatRoomId, ChatMessageReq chatMessageReq) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(ChatRoomNotFoundException::new);
-        User user = userRepository.findById(chatMessageReq.getSenderId())
+        User sender = userRepository.findById(chatMessageReq.getSenderId())
                 .orElseThrow(UserNotFoundException::new);
 
-        ChatMessage chatMessage = chatMessageReq.toEntity(chatRoom, user);
+        ChatMessage chatMessage = chatMessageReq.toEntity(chatRoom, sender);
 
         chatMessageRepository.save(chatMessage);
 
+        chatRoom.getUserChatRooms().stream()
+                .filter(userChatRoom -> !userChatRoom.getUser().getId().equals(sender.getId()))
+                .forEach(UserChatRoom::increaseUnreadCount);
+
         try {
-            sendChatMessagePushNotification(chatRoom, user, chatMessage);
+            sendChatMessagePushNotification(chatRoom, sender, chatMessage);
         } catch (Exception e) {
             log.error("푸시 알림 전송 중 예외 발생. 정상 흐름 변환.");
             e.printStackTrace();

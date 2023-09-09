@@ -28,10 +28,17 @@ public class UserChatRoom {
     @Setter
     private ChatRoom chatRoom;
 
+    private Integer unreadCount;
+
+    public void increaseUnreadCount() {
+        unreadCount++;
+    }
+
     public static UserChatRoom createUserChatRoom(User user, ChatRoom chatRoom) {
         return UserChatRoom.builder()
                 .user(user)
                 .chatRoom(chatRoom)
+                .unreadCount(0)
                 .build();
     }
 
